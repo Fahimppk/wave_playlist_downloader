@@ -46,7 +46,7 @@ export async function spotifyFetch(url: string): Promise<Response> {
 
 export async function spotifyApiError(response: Response) {
   if (response.status === 401) return new SpotifyError("spotify_reauthorization_required", 401, "Spotify authorization expired. Connect Spotify again.");
-  if (response.status === 403) return new SpotifyError("spotify_playlist_forbidden", 403, "Spotify only provides playlist items to the playlist owner or a collaborator. Check playlist access and your Spotify app permissions.");
+  if (response.status === 403) return new SpotifyError("spotify_playlist_forbidden", 403, "Spotify denied access to this playlist's tracks. The signed-in Spotify account must own the playlist or be added as a collaborator. Public or followed playlists owned by someone else are not enough. Try a playlist you own, or ask its owner to add your Spotify account as a collaborator.");
   if (response.status === 404) return new SpotifyError("spotify_playlist_not_found", 404, "Playlist not found or unavailable to this Spotify account.");
   if (response.status === 429) {
     const payload = await response.json().catch(() => null) as { error?: { reason?: string } } | null;

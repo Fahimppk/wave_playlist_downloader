@@ -84,6 +84,21 @@ When Spotify is configured, playlist metadata is live; when Jamendo is configure
 
 This project uses the Next.js App Router and can run on a platform supporting Next.js server routes. Use HTTPS in production and configure `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`, `SESSION_SECRET`, and `JAMENDO_CLIENT_ID` in the host's encrypted environment settings as needed. Register the exact HTTPS Spotify callback URL in the Spotify Dashboard. Token sessions are encrypted server-side using `SESSION_SECRET`. The included request throttles are process-local and suitable only for a single-instance personal setup; use a shared limiter for multiple instances. Do not store downloaded audio persistently on a shared server. Complete the Android Chrome and Windows Edge device checks above against the target deployment before release.
 
+## Deploy to Cloudflare Workers
+
+The project is configured for Cloudflare Workers using the OpenNext adapter, which supports this app's Next.js App Router and server route handlers. Install dependencies, authenticate Wrangler, preview in the Workers runtime, then deploy:
+
+```powershell
+npm install
+npx wrangler login
+npm run preview
+npm run deploy
+```
+
+The first deployment without provider credentials runs in clearly labeled mock mode. It creates a `workers.dev` URL. To enable Spotify, register `<workers.dev URL>/api/spotify/callback` as the Spotify app redirect URI, then add these values as Worker secrets in Cloudflare (Dashboard → Workers & Pages → your Worker → Settings → Variables and Secrets): `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`, and `SESSION_SECRET` (at least 32 characters). Add `JAMENDO_CLIENT_ID` as a secret to enable live Jamendo search. Deploy again after configuring secrets. Keep secret values out of `wrangler.jsonc`, Git, and chat. The local `.dev.vars*` files are ignored by Git.
+
+Cloudflare now recommends vinext as the default for new Next.js projects. This existing Next.js 15 app uses the OpenNext adapter, which Cloudflare documents for existing Next.js applications; verify the Workers preview before the production deployment. The application's in-memory request throttles remain process-local and are not a shared rate limit across Worker instances.
+
 ## Automated checks
 
 `npm test` runs the regression suite for playlist URL validation and pagination, match scoring, quality selection, queue eligibility, safe filenames, API error handling, app throttling, Jamendo permission and format failures, missing credentials, and responsive CSS rules. Run `npm run build` before deployment to type-check and compile the production app. The mobile CSS check is not a substitute for testing on a physical Android device.

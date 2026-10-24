@@ -95,9 +95,16 @@ npm run preview
 npm run deploy
 ```
 
+If deploying through Cloudflare **Workers Builds** connected to GitHub, configure the build settings as follows:
+
+- Build command: `npx opennextjs-cloudflare build`
+- Deploy command: `npx opennextjs-cloudflare deploy`
+
+Do not pair `npm run build` with `npx wrangler deploy`: `npm run build` only creates the standard Next.js output, while Wrangler's OpenNext deploy step requires the adapter-generated `.open-next` bundle. The adapter build command runs the Next.js build and then creates that bundle. Alternatively, use the included `npm run deploy` command for a local build and deployment.
+
 The first deployment without provider credentials runs in clearly labeled mock mode. It creates a `workers.dev` URL. To enable Spotify, register `<workers.dev URL>/api/spotify/callback` as the Spotify app redirect URI, then add these values as Worker secrets in Cloudflare (Dashboard → Workers & Pages → your Worker → Settings → Variables and Secrets): `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REDIRECT_URI`, and `SESSION_SECRET` (at least 32 characters). Add `JAMENDO_CLIENT_ID` as a secret to enable live Jamendo search. Deploy again after configuring secrets. Keep secret values out of `wrangler.jsonc`, Git, and chat. The local `.dev.vars*` files are ignored by Git.
 
-Cloudflare now recommends vinext as the default for new Next.js projects. This existing Next.js 15 app uses the OpenNext adapter, which Cloudflare documents for existing Next.js applications; verify the Workers preview before the production deployment. The application's in-memory request throttles remain process-local and are not a shared rate limit across Worker instances.
+Cloudflare now recommends vinext as the default for new Next.js projects. This Next.js 16 app uses the OpenNext adapter, which Cloudflare documents for existing Next.js applications; verify the Workers preview before the production deployment. The application's in-memory request throttles remain process-local and are not a shared rate limit across Worker instances.
 
 ## Automated checks
 
